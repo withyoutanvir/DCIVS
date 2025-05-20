@@ -1,7 +1,7 @@
 # DIVS
 
 A blockchain-based Decentralized Identity Verification System (DIVS) that leverages MetaMask for secure transactions and data encryption, with a robust User and Requester interface developed using React.
-# WEBSITE URL : https://dcivs.netlify.app/
+### WEBSITE URL : https://dcivs.netlify.app/
 ## Description
 
 DIVS is designed as a two-phase project, focusing on secure integration with blockchain technology. It empowers users with a decentralized approach to identity verification.
