@@ -1,0 +1,5 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Add any global styles if needed, but Tailwind handles most utilities */
