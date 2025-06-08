@@ -11,7 +11,7 @@ import {
 import { useTheme } from "next-themes";
 import RequesterCheckbox from "./RequesterCheckbox";
 import { ethers } from "ethers";
-import datarequestabi from "../Datarequestabi.json";
+
 import ProgressBar from "./ProgressBar";
 
 export default function CardUI(props) {

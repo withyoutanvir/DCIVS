@@ -72,3 +72,100 @@
     font-family: "Rubik", sans-serif;
     font-weight: 500;
   }
+
+  /* -- Source Link Styles -- */
+
+  .welcome-text {
+  font-size: 3rem;
+  font-weight: bold;
+  text-align: center;
+  color: white;
+  transition: transform 0.3s ease, text-shadow 0.3s ease;
+}
+
+.welcome-text:hover {
+  transform: scale(1.05);
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+  color: #ffeb3b; /* optional glow effect */
+}
+
+/* Background + blobs */
+.homepage-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.animated-blobs {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.4;
+  filter: blur(80px);
+  animation: float 20s infinite ease-in-out;
+}
+
+.blob1 {
+  background: #ff6ec4;
+  width: 400px;
+  height: 400px;
+  top: 10%;
+  left: 10%;
+}
+
+.blob2 {
+  background: #7873f5;
+  width: 300px;
+  height: 300px;
+  bottom: 15%;
+  right: 10%;
+}
+
+.blob3 {
+  background: #4ef4ff;
+  width: 250px;
+  height: 250px;
+  top: 40%;
+  right: 30%;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0) translateX(0);
+  }
+  50% {
+    transform: translateY(-30px) translateX(20px);
+  }
+  100% {
+    transform: translateY(0) translateX(0);
+  }
+}
+
+/* Heading animation */
+.homepageH1 {
+  z-index: 10;
+  color: white;
+  font-size: 3.5rem;
+  font-weight: bold;
+  text-align: center;
+  transition: transform 0.3s ease, text-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.homepageH1:hover {
+  transform: scale(1.08);
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.7), 0 0 40px #00f0ff;
+  color: #ffffff;
+}

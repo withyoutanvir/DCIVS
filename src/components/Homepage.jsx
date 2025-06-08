@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "./Homepage.css"; // Make sure this CSS file contains the updated styles
+import "./Homepage.css";
 
 const Homepage = () => {
   const [title, setTitle] = useState("WELCOME TO D.I.V.S");
@@ -8,18 +8,11 @@ const Homepage = () => {
     const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     let interval = null;
 
-    const updateTitle = (event) => {
+    const updateTitle = () => {
       let iteration = 0;
-
       clearInterval(interval);
 
       interval = setInterval(() => {
-        const h1Element = document.querySelector(".homepageH1");
-
-        if (!h1Element) {
-          return;
-        }
-
         setTitle((currentTitle) =>
           currentTitle
             .split("")
@@ -41,21 +34,25 @@ const Homepage = () => {
     };
 
     const h1Element = document.querySelector(".homepageH1");
-
-    if (!h1Element) {
-      return;
+    if (h1Element) {
+      h1Element.addEventListener("mouseover", updateTitle);
     }
-
-    h1Element.addEventListener("mouseover", updateTitle);
 
     return () => {
       clearInterval(interval);
-      h1Element.removeEventListener("mouseover", updateTitle);
+      if (h1Element) {
+        h1Element.removeEventListener("mouseover", updateTitle);
+      }
     };
   }, []);
 
   return (
-    <div className="centered">
+    <div className="homepage-container">
+      <div className="animated-blobs">
+        <div className="blob blob1"></div>
+        <div className="blob blob2"></div>
+        <div className="blob blob3"></div>
+      </div>
       <h1 className="homepageH1">{title}</h1>
     </div>
   );

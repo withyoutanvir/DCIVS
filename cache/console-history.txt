@@ -1,0 +1,2 @@
+npx hardhat run scripts/deploy.cjs --network localhost
+# 2. Deploy the contract to localhost

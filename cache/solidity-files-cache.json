@@ -1,0 +1,40 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "D:\\College_Projects\\DCIVS\\contracts\\DataRequest.sol": {
+      "lastModificationDate": 1748103994185,
+      "contentHash": "af531c86c39770170cb03dd17c43f59d",
+      "sourceName": "contracts/DataRequest.sol",
+      "solcConfig": {
+        "version": "0.8.18",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.8.18"
+      ],
+      "artifacts": [
+        "EnhancedDataRequestContract"
+      ]
+    }
+  }
+}
