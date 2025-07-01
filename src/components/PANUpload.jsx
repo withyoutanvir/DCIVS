@@ -1,113 +1,112 @@
-import React, { useState, useRef } from 'react';
-import axios from 'axios';
-import { Card, CardHeader, CardBody, Button } from "@nextui-org/react";
+import React, { useState } from "react";
+import { Card, CardHeader, CardBody, Button, Input } from "@nextui-org/react";
 import { useTheme } from "next-themes";
-import { Progress } from "@nextui-org/react";
+import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf";
 
-function PANUpload(props) {
+// Important: Set worker source manually (CDN fallback or local path)
+pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+
+function PANVerification() {
+  const [pan, setPan] = useState("");
+  const [name, setName] = useState("");
+  const [dob, setDob] = useState("");
+  const [panValidity, setPanValidity] = useState("");
   const [file, setFile] = useState(null);
-  const [uploadStatus, setUploadStatus] = useState('');
-  const [uploading, setUploading] = useState(false);
-  const [extractedData, setExtractedData] = useState(null);
   const { theme } = useTheme();
-  const shadowClass = theme === "dark" ? "shadow-white" : "shadow-black";
-  const fileInputRef = useRef(null);
 
-  const onFileChange = event => {
-    setFile(event.target.files[0]);
-    setUploadStatus('');
-    setUploading(false);
-    setExtractedData(null);
+  const verifyPAN = async () => {
+    try {
+      const response = await fetch("https://test-api.sandbox.co.in/kyc/pan/verify", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          pan: pan,
+          name: name,
+          date_of_birth: dob
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.status === "valid") {
+        setPanValidity("✅ PAN is valid and matches name and DOB.");
+      } else {
+        setPanValidity(`❌ PAN invalid: ${data.remarks || "Mismatch or not found"}`);
+      }
+    } catch (err) {
+      console.error("PAN verification error:", err);
+      setPanValidity("❌ Error verifying PAN.");
+    }
   };
 
-  const onFileUpload = () => {
-    if (!file) {
-      setUploadStatus('Please select a PAN PDF file first.');
+  const handlePDFUpload = async (event) => {
+    const selectedFile = event.target.files[0];
+    if (!selectedFile || selectedFile.type !== "application/pdf") {
+      alert("Please upload a valid PDF file.");
       return;
     }
-    setUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
 
-    axios.post('https://your-backend-api.com/upload-pan', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
+    const fileReader = new FileReader();
+    fileReader.onload = async function () {
+      const typedarray = new Uint8Array(this.result);
+
+      const pdf = await pdfjsLib.getDocument({ data: typedarray }).promise;
+      let textContent = "";
+
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        const strings = content.items.map((item) => item.str);
+        textContent += strings.join(" ");
       }
-    })
-    .then(response => {
-      // Assume response.data has extracted PAN info
-      const panInfo = response.data;
-      setExtractedData(panInfo);
-      setUploadStatus('PAN uploaded and data extracted successfully!');
-      setUploading(false);
-      props.setUserData(panInfo); // pass extracted data upstream if needed
-      props.jsonObject(true);
-    })
-    .catch(error => {
-      console.error('Error uploading PAN file', error);
-      setUploadStatus(`Error uploading PAN file: ${error.message}`);
-      setUploading(false);
-    });
-  };
 
-  const handleClick = () => {
-    fileInputRef.current.click();
+      const panRegex = /[A-Z]{5}[0-9]{4}[A-Z]/;
+      const dobRegex = /\d{2}\/\d{2}\/\d{4}/;
+      const nameRegex = /Name[\s:]*([A-Z ]{3,})/i;
+
+      const foundPan = textContent.match(panRegex);
+      const foundDob = textContent.match(dobRegex);
+      const foundNameMatch = textContent.match(nameRegex);
+
+      if (foundPan) setPan(foundPan[0]);
+      if (foundDob) {
+        const [day, month, year] = foundDob[0].split("/");
+        setDob(`${year}-${month}-${day}`);
+      }
+      if (foundNameMatch) setName(foundNameMatch[1].trim());
+
+      setFile(selectedFile);
+    };
+
+    fileReader.readAsArrayBuffer(selectedFile);
   };
 
   return (
     <div className="flex justify-center items-center py-20">
-      <Card
-        shadow="lg"
-        className={`min-w-[475px] ${theme === "dark" ? "light" : "dark"} bg-background text-foreground ${shadowClass} py-3`}
-      >
-        <CardHeader className="pb-0 pt-2 px-4 flex-col items-center">
-          <div className="flex flex-col items-center mb-5">
-            <h2 className="font-bold text-large">UPLOAD YOUR PAN CARD PDF</h2>
-            <h5 className="font-bold text-large">
-              Please upload your PAN card PDF downloaded from NSDL or your provider.
-            </h5>
+      <Card className="min-w-[500px] p-4">
+        <CardHeader className="text-xl font-bold">Verify Your PAN Card</CardHeader>
+        <CardBody className="flex flex-col gap-4">
+          <Input label="PAN Number" value={pan} onChange={(e) => setPan(e.target.value)} />
+          <Input label="Name (as per PAN)" value={name} onChange={(e) => setName(e.target.value)} />
+          <Input label="Date of Birth (YYYY-MM-DD)" value={dob} onChange={(e) => setDob(e.target.value)} />
+
+          <div className="flex flex-col gap-2 mt-4">
+            <label className="text-sm font-semibold">OR Upload PAN PDF:</label>
+            <input type="file" accept="application/pdf" onChange={handlePDFUpload} />
+            {file && <p className="text-xs text-green-600">✅ {file.name} selected</p>}
           </div>
-          <input
-            type="file"
-            accept="application/pdf"
-            ref={fileInputRef}
-            onChange={onFileChange}
-            style={{ display: 'none' }}
-          />
-          <div className="flex items-center justify-center w-full">
-            <Button color="success" auto onClick={handleClick}>
-              Choose PAN PDF
-            </Button>
-            {file && <span className="ml-2">{file.name}</span>}
-          </div>
-        </CardHeader>
-        <CardBody className="flex flex-col items-center">
-          {file && (uploading ? (
-            <Progress
-              size="sm"
-              isIndeterminate
-              color="secondary"
-              aria-label="Loading..."
-              className="max-w-md"
-            />
-          ) : (
-            <Button onClick={onFileUpload} color="secondary" disabled={uploading} auto style={{ width: '50%' }}>
-              Upload PAN
-            </Button>
-          ))}
-          <p>{uploadStatus}</p>
-          {extractedData && (
-            <div className="mt-4 text-left">
-              <p><strong>PAN Number:</strong> {extractedData.panNumber}</p>
-              <p><strong>Name:</strong> {extractedData.name}</p>
-              <p><strong>Date of Birth:</strong> {extractedData.dateOfBirth}</p>
-              {/* Add more fields if your backend provides */}
-            </div>
-          )}
+
+          <Button onClick={verifyPAN} color="primary" className="mt-4">
+            Verify PAN
+          </Button>
+
+          {panValidity && <p className="mt-2 font-semibold">{panValidity}</p>}
         </CardBody>
       </Card>
     </div>
   );
 }
 
-export default PANUpload;
+export default PANVerification;

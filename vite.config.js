@@ -8,10 +8,11 @@ export default defineConfig({
     alias: {
       buffer: 'buffer/',
       process: 'process/browser',
+      stream: 'stream-browserify', // Optional, useful for polyfilling crypto streams
     },
   },
   define: {
-    'process.env': {},
+    'process.env': {}, // Ensures compatibility with packages expecting process.env
   },
   optimizeDeps: {
     include: ['buffer', 'process'],
